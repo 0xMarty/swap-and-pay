@@ -69,12 +69,10 @@ contract SwapAndPay {
 
         IERC20(_token).approve(_router, _amount);
 
-        IRouter(_router).swapExactTokensForETH(_amount, _minETH, path, address(this), block.timestamp + 10);
+        uint[] memory amounts = IRouter(_router).swapExactTokensForETH(_amount, _minETH, path, _payee, block.timestamp + 10);
         
-        ethPayed += address(this).balance;
-        addressToPaid[_payee] += address(this).balance;
+        ethPayed += amounts[amounts.length - 1];
+        addressToPaid[_payee] += amounts[amounts.length - 1];
         tokensSwaped[_token] += _amount;
-
-        _payee.transfer(address(this).balance);
     }
 }
