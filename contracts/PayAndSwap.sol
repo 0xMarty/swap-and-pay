@@ -8,7 +8,14 @@ interface IRouter {
 
 contract PayAndSwap {
 
+    uint public ethPayed;
+
     address immutable public owner;
+    address immutable public WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+    /// @notice Amount of eth address has recieved
+    mapping(address => uint) public addressToPaid;
+    mapping(address => uint) public tokensSwaped;
 
     constructor (address _owner) {
         owner = _owner;
@@ -17,17 +24,26 @@ contract PayAndSwap {
     function swapAndPay(
         address payable _payee,
         address _router,
-        address[] calldata _path,
+        address _token,
         uint _amount,
         uint _minETH
     ) external {
         require(msg.sender == owner, "not owner");
 
-        IRouter(_router).swapExactTokensForETH(_amount, _minETH, _path, address(this), block.timestamp + 10);
+        address[] memory path = new address[](2);
+        path[0] = _token;
+        path[1] = WETH;
+
+        IRouter(_router).swapExactTokensForETH(_amount, _minETH, path, address(this), block.timestamp + 10);
+        
+        ethPayed += address(this).balance;
+        addressToPaid[_payee] += address(this).balance;
+        tokensSwaped[_token] += _amount;
 
         _payee.transfer(address(this).balance);
-
     }
+
+
 
 
 }
