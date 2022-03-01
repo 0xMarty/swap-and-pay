@@ -5,22 +5,43 @@ interface IRouter {
         external
         returns (uint[] memory amounts);
 }
-
+/// @title Swap And Pay contract
+/// @author 0xMarty
+/// @notice Swaps from ERC20 to ETH and pays specified address
 contract PayAndSwap {
 
+    ///STATE VARIABLES///
+
+    /// @notice amount of eth payed
     uint public ethPayed;
 
+    /// @notice payer of contract
     address immutable public owner;
+
+    /// @notice addresses amount of WETH
     address immutable public WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     /// @notice Amount of eth address has recieved
     mapping(address => uint) public addressToPaid;
+
+    /// @notice amount of tokens swapped
     mapping(address => uint) public tokensSwaped;
 
+    /// CONSTRUCTOR ///
+    
+    /// @param _owner  Address that pays eth
     constructor (address _owner) {
         owner = _owner;
     }
 
+    /// OWNER FUNCTION ///
+
+    /// @notice         Owner pays specific address
+    /// @param _payee   Address of who is being paid
+    /// @param _router  Address of the router
+    /// @param _token   Address of the token being used
+    /// @param _amount  Amount of  being transfered
+    /// @param _minETH  Min amount of ETH 
     function swapAndPay(
         address payable _payee,
         address _router,
@@ -42,8 +63,4 @@ contract PayAndSwap {
 
         _payee.transfer(address(this).balance);
     }
-
-
-
-
 }
